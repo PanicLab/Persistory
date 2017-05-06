@@ -84,8 +84,8 @@ public class Logger {
                 .resolveSibling(RELATIVE_LOG_PATH);
     }
 
-    public void log(String mode, String message) {
-        switch (mode) {
+    public void log(String level, String message) {
+        switch (level) {
             case PRODUCTION:
                 logOnProduction(message);
                 break;
@@ -96,7 +96,7 @@ public class Logger {
                 logOnDebug(message);
                 break;
             default:
-                throw new InternalError("Неизвестный режим кофигурации Persistory: " + mode);
+                throw new InternalError("Неизвестный режим кофигурации Persistory: " + level);
         }
     }
 
