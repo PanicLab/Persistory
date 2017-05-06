@@ -76,6 +76,15 @@ public class Logger {
         this(conf.get(MODE), dest);
     }
 
+    public String name() {
+        return this.name;
+    }
+
+    public Logger setName(String name) {
+        this.name = name;
+        return this;
+    }
+
 
     public Path getLogPath() {
         return Paths.get(Utils.getApplicationURI(this))
@@ -205,5 +214,15 @@ public class Logger {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null) return false;
+        if(this.hashCode() != obj.hashCode()) return false;
+        if(this.getClass() != obj.getClass()) return false;
+        Logger other = getClass().cast(obj);
+        return this.name().equals(other.name());
     }
 }
