@@ -1,5 +1,6 @@
 package com.paniclab.persistory.configuration;
 
+import com.paniclab.persistory.Logger;
 import com.paniclab.persistory.Utils;
 
 import java.io.*;
@@ -12,7 +13,7 @@ import java.nio.file.Paths;
  *
  * 	Configuration cfg = new ConfigurationFactory().getDefault()
  * 	                                    .set(Configuration.MODE, Configuration.DEBUG)
- * 	                                    .set(Configuration.DEFAULT_DBRM, PersistorManager.H2);
+ * 	                                    .set(Configuration.DEFAULT_DBMS, PersistorManager.H2);
  * 	                                    .add(Configuration.DOMAIN_PACKAGE, "com.github.paniclab.coolApp.Models")
  * 	                                    .add(Configuration.CLASS_TO_PERSIST, "com.github.paniclab.coolApp.Models.jet")
  * 	                                    .create();
@@ -22,7 +23,7 @@ import java.nio.file.Paths;
  */
 public class ConfigurationFactory {
 
-    private Configuration configuration = null;
+    private Configuration configuration = new Configuration();
     
     public ConfigurationFactory() {
     }
@@ -48,7 +49,8 @@ public class ConfigurationFactory {
         try (BufferedReader br = new BufferedReader(new FileReader(cfgPath.toFile()))){
             String line = br.readLine();
             while (line != null) {
-                System.out.println(line);
+                //System.out.println(line);
+                populateConfig(line);
                 line = br.readLine();
             }
         } catch (FileNotFoundException e) {
@@ -64,12 +66,19 @@ public class ConfigurationFactory {
         }
     }
 
-
-    public ConfigurationFactory set(String property, String value) {
-        return this;
+    private void populateConfig(String line) {
+        String key = line.split("=")[0].trim();
+        String value = line.split("=")[1].trim();
+        this.configuration.set(key, value);
     }
 
 
+    public ConfigurationFactory set(String property, String value) {
+        this.configuration.set(property,value);
+        return this;
+    }
+
+    //TODO не реализовано
     public ConfigurationFactory add(String property, String value) {
         return this;
     }
