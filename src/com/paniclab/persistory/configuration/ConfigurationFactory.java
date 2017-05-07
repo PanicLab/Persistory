@@ -49,7 +49,6 @@ public class ConfigurationFactory {
         try (BufferedReader br = new BufferedReader(new FileReader(cfgPath.toFile()))){
             String line = br.readLine();
             while (line != null) {
-                //System.out.println(line);
                 populateConfig(line);
                 line = br.readLine();
             }
