@@ -145,6 +145,22 @@ public class Logger {
         printStream.println(message);
     }
 
+    public void log(String level, String message, Object...objects) {
+        switch (level) {
+            case PRODUCTION:
+                logOnProduction(message, objects);
+                break;
+            case DEVELOPING:
+                logOnDevelop(message, objects);
+                break;
+            case DEBUG:
+                logOnDebug(message, objects);
+                break;
+            default:
+                throw new InternalError("Неизвестный режим вывода логгера: " + dest);
+        }
+    }
+
 
     public void logOnDevelop(String message) {
         if(execMode.equals(PRODUCTION)) return;
@@ -157,7 +173,7 @@ public class Logger {
         log(message);
     }
 
-    public void LogOnProduction(String message, Object...objects) {
+    public void logOnProduction(String message, Object...objects) {
         log(message,objects);
     }
 
@@ -177,7 +193,7 @@ public class Logger {
         }
     }
 
-    public void LogOnDevelop(String message, Object...objects) {
+    public void logOnDevelop(String message, Object...objects) {
         if(execMode.equals(PRODUCTION)) return;
         log(message, objects);
     }

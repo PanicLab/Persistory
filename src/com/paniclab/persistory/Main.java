@@ -47,6 +47,6 @@ public class Main {
         Logger fileLogger = new Logger(DEBUG, Logger.TO_FILE);
         fileLogger.log(DEVELOPING, "Hello");
 
-        logger.LogOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
+        logger.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
     }
 }
