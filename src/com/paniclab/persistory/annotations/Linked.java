@@ -23,4 +23,5 @@ public @interface Linked {
     Class<?> reference();
     int assotiation();
     int type()default UNIDIRECTIONAL;
+    JoinForeignKeyColumn foreignKey() default @JoinForeignKeyColumn;
 }

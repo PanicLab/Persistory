@@ -1,7 +1,9 @@
 package com.paniclab.persistory;
 
 import com.paniclab.persistory.annotations.Entity;
+import com.paniclab.persistory.annotations.JoinForeignKeyColumn;
 import com.paniclab.persistory.annotations.Linked;
+import com.paniclab.persistory.annotations.OnDelete;
 import com.paniclab.persistory.configuration.Configuration;
 import com.paniclab.persistory.configuration.ConfigurationFactory;
 
@@ -9,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.paniclab.persistory.annotations.Linked.*;
+import static com.paniclab.persistory.annotations.OnDelete.*;
 import static com.paniclab.persistory.configuration.Configuration.*;
 
 /**
@@ -20,7 +23,10 @@ import static com.paniclab.persistory.configuration.Configuration.*;
         type = UNIDIRECTIONAL)
 
 @Linked(reference = Logger.class,
-        assotiation = ONE_TO_ONE)
+        assotiation = ONE_TO_ONE,
+        foreignKey = @JoinForeignKeyColumn(columnName = "niaM",
+                notNull = true,
+                onDelete = OnDelete.CASCADE))
 public class Main {
 
     public static void main(String[] args) {
