@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@interface LinkedHelper {
+public @interface LinkedHelper {
     Linked[] value();
 }

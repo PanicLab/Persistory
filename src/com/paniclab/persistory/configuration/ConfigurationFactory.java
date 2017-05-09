@@ -66,8 +66,9 @@ public class ConfigurationFactory {
     }
 
     private void populateConfig(String line) {
-        String key = line.split("=")[0].trim();
-        String value = line.split("=")[1].trim();
+        String[] s = line.split("=");
+        String key = s[0].trim();
+        String value = s.length > 1 ? line.split("=")[1].trim() : "";
         this.configuration.set(key, value);
     }
 
