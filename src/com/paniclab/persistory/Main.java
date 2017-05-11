@@ -5,14 +5,12 @@ import com.paniclab.persistory.annotations.JoinForeignKeyColumn;
 import com.paniclab.persistory.annotations.Linked;
 import com.paniclab.persistory.annotations.OnDelete;
 import com.paniclab.persistory.configuration.Configuration;
-import com.paniclab.persistory.configuration.ConfigurationFactory;
+
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.paniclab.persistory.annotations.Linked.*;
-import static com.paniclab.persistory.annotations.OnDelete.*;
-import static com.paniclab.persistory.configuration.Configuration.*;
 
 /**
  * Класс создан в тестовых целях. Будет удален в окончательной версии
@@ -31,9 +29,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Configuration cfg = new ConfigurationFactory().getDefault()
+        Configuration cfg = Configuration.builder()
                 .add("ss", "ss")
-                .set(MODE, PRODUCTION)
+                .set(Configuration.MODE, Configuration.PRODUCTION)
                 .create();
 
         //cfg.get(MODE);
@@ -51,17 +49,17 @@ public class Main {
         System.out.println(newPath);
 
         //Path absoluteLogPath = Paths.get(Utils.getApplicationURI(newPath));
-        Logger logger = new Logger(PRODUCTION);
+        Logger logger = new Logger(Configuration.PRODUCTION);
         System.out.println();
         System.out.println("Абсолютный путь для логов:");
         System.out.println(logger.getLogPath());
 
-        logger.log(DEVELOPING, "Это лог сообщение");
+        logger.log(Configuration.DEVELOPING, "Это лог сообщение");
        //logger.log("Это сообщение появляется всегда");
         logger.logOnDevelop("Еще одно сообщение");
 
-        Logger fileLogger = new Logger(DEBUG, Logger.TO_FILE);
-        fileLogger.log(DEVELOPING, "Hello");
+        Logger fileLogger = new Logger(Configuration.DEBUG, Logger.TO_FILE);
+        fileLogger.log(Configuration.DEVELOPING, "Hello");
 
         logger.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
     }

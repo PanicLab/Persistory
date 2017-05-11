@@ -1,6 +1,7 @@
 package com.paniclab.persistory;
 
 import com.paniclab.persistory.configuration.Configuration;
+import com.paniclab.persistory.configuration.ConfigurationImpl;
 
 import java.io.*;
 import java.nio.file.*;
@@ -8,10 +9,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 import static com.paniclab.persistory.Utils.isNot;
-import static com.paniclab.persistory.configuration.Configuration.*;
 
 /**
  * Простенький логгер для местного использования. Может писать логи в файл, System.out или System.err по выбору. По
@@ -63,32 +62,32 @@ public class Logger {
         this.dest = dest;
     }
 
-    public Logger(Configuration conf) {
-        this(conf.get(MODE));
+    public Logger(ConfigurationImpl conf) {
+        this(conf.get(Configuration.MODE));
         this.dest = SYS_OUT;
     }
 
-    public Logger(Configuration conf, int dest) {
-        this(conf.get(MODE), dest);
+    public Logger(ConfigurationImpl conf, int dest) {
+        this(conf.get(Configuration.MODE), dest);
     }
 
 
     public Path getLogPath() {
         return Paths.get(Utils.getApplicationURI(this))
-                .resolve(DEFAULT_CONFIG)
+                .resolve(Configuration.DEFAULT_CONFIG)
                 .getParent()
                 .resolveSibling(RELATIVE_LOG_PATH);
     }
 
     public void log(String level, String message) {
         switch (level) {
-            case PRODUCTION:
+            case Configuration.PRODUCTION:
                 logOnProduction(message);
                 break;
-            case DEVELOPING:
+            case Configuration.DEVELOPING:
                 logOnDevelop(message);
                 break;
-            case DEBUG:
+            case Configuration.DEBUG:
                 logOnDebug(message);
                 break;
             default:
@@ -147,13 +146,13 @@ public class Logger {
 
     public void log(String level, String message, Object...objects) {
         switch (level) {
-            case PRODUCTION:
+            case Configuration.PRODUCTION:
                 logOnProduction(message, objects);
                 break;
-            case DEVELOPING:
+            case Configuration.DEVELOPING:
                 logOnDevelop(message, objects);
                 break;
-            case DEBUG:
+            case Configuration.DEBUG:
                 logOnDebug(message, objects);
                 break;
             default:
@@ -163,13 +162,13 @@ public class Logger {
 
 
     public void logOnDevelop(String message) {
-        if(execMode.equals(PRODUCTION)) return;
+        if(execMode.equals(Configuration.PRODUCTION)) return;
         log(message);
     }
 
     public void logOnDebug(String message) {
-        if(execMode.equals(PRODUCTION)) return;
-        if(execMode.equals(DEVELOPING)) return;
+        if(execMode.equals(Configuration.PRODUCTION)) return;
+        if(execMode.equals(Configuration.DEVELOPING)) return;
         log(message);
     }
 
@@ -194,13 +193,13 @@ public class Logger {
     }
 
     public void logOnDevelop(String message, Object...objects) {
-        if(execMode.equals(PRODUCTION)) return;
+        if(execMode.equals(Configuration.PRODUCTION)) return;
         log(message, objects);
     }
 
     public void logOnDebug(String message, Object...objects) {
-        if(execMode.equals(PRODUCTION)) return;
-        if(execMode.equals(DEVELOPING)) return;
+        if(execMode.equals(Configuration.PRODUCTION)) return;
+        if(execMode.equals(Configuration.DEVELOPING)) return;
         log(message, objects);
     }
 

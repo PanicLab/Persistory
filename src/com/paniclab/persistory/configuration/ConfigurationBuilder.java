@@ -1,6 +1,6 @@
 package com.paniclab.persistory.configuration;
 
-import com.paniclab.persistory.Logger;
+import com.paniclab.persistory.InternalError;
 import com.paniclab.persistory.Utils;
 
 import java.io.*;
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 /**
  * Класс предназначен для создания объекта типа Configuration. Используется следующий синтаксис:
  *
- * 	Configuration cfg = new ConfigurationFactory().getDefault()
+ * 	Configuration cfg = new ConfigurationBuilder().getDefault()
  * 	                                    .set(Configuration.MODE, Configuration.DEBUG)
  * 	                                    .set(Configuration.DEFAULT_DBMS, PersistorManager.H2);
  * 	                                    .add(Configuration.DOMAIN_PACKAGE, "com.github.paniclab.coolApp.Models")
@@ -21,15 +21,14 @@ import java.nio.file.Paths;
  * 	Создание конфигурации опираетс на конфигурационный файл, содержащий в себе настройки по умолчанию. В процессе
  * 	создания экземпляра типа Configuration параметры могут быть добавлены (или переопределены) программно.
  */
-public class ConfigurationFactory {
+public class ConfigurationBuilder {
 
-    private Configuration configuration = new Configuration();
+    private ConfigurationImpl.ConfigHelper configuration = new ConfigurationImpl.ConfigHelper();
     
-    public ConfigurationFactory() {
-    }
+    ConfigurationBuilder() {}
 
 
-    public ConfigurationFactory getDefault() {
+    public final ConfigurationBuilder getDefault() {
 
         Path defaultConfigPath = getDefaultConfigPath();
         readDefaultConfig(defaultConfigPath);
@@ -72,19 +71,27 @@ public class ConfigurationFactory {
         this.configuration.set(key, value);
     }
 
-
-    public ConfigurationFactory set(String property, String value) {
+    /**
+     * Метод задает параметр конфигурации и его значение.
+     * @param property: один из параметров конфигурации.
+     * @param value: значение параметра конфигурации
+     */
+    public ConfigurationBuilder set(String property, String value) {
         this.configuration.set(property,value);
         return this;
     }
 
     //TODO не реализовано
-    public ConfigurationFactory add(String property, String value) {
+    public ConfigurationBuilder add(String property, String value) {
         return this;
     }
 
-
     public Configuration create() {
-        return configuration;
+        return immutable(configuration);
     }
+
+    private Configuration immutable(ConfigurationImpl.ConfigHelper helper) {
+        return new ConfigurationImpl(helper);
+    }
+
 }
