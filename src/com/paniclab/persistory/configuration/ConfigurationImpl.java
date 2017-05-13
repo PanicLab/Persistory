@@ -47,15 +47,13 @@ final class ConfigurationImpl implements Configuration {
          * @param property: один из параметров конфигурации.
          * @param value: значение параметра конфигурации
          */
-        Builder set(String property, String value) {
+        void set(String property, String value) {
             properties.put(property,value);
-            return this;
         }
 
 
         //TODO не реализовано
-        Builder add(String property, String value) {
-            return this;
+        void add(String property, String value) {
         }
 
         Configuration create() {
