@@ -1,8 +1,11 @@
 package com.paniclab.persistory;
 
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class Utils {
 
@@ -29,4 +32,18 @@ public final class Utils {
         return result;
     }
 
+    public static Path getApplicationPath(Object obj) {
+        URI uri = getApplicationURI(obj);
+        return Paths.get(uri);
+    }
+
+    public static byte[] stringToBytes(String string, String charset) {
+        byte[] result = null;
+        try {
+            result = string.getBytes(charset);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }

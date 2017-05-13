@@ -1,12 +1,22 @@
 package com.paniclab.persistory.table.constraint;
 
 import com.paniclab.persistory.InternalError;
+import com.paniclab.persistory.Utils;
+import com.paniclab.persistory.configuration.Configuration;
+import com.paniclab.persistory.configuration.ConfigurationImpl;
 import com.paniclab.persistory.table.ColumnImage;
 import com.paniclab.persistory.table.TableImage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
+import static com.paniclab.persistory.Utils.isNot;
 
 /**
  * Created by Сергей on 09.05.2017.
@@ -18,8 +28,22 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private TableImage table;
     private String expression;
     private Collection<ColumnImage> columns;
+    private TableImage referenceTable;
+    private Collection<ColumnImage> referenceColumns;
 
-    ConstraintImpl() {}
+
+    private ConstraintImpl() {}
+
+
+    ConstraintImpl(Embryo embryo) {
+        this.name = embryo.name;
+        this.type = embryo.type;
+        this.table = embryo.table;
+        this.expression = embryo.expression;
+        this.columns = embryo.columns;
+        this.referenceTable = embryo.referenceTable;
+        this.referenceColumns = embryo.referenceColumns;
+    }
 
     @Override
     public int getType() {
@@ -43,43 +67,115 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
 
     @Override
     public TableImage getReferenceTable() {
-        return null;
+        return referenceTable;
     }
 
     @Override
     public Collection<ColumnImage> getReferenceColumns() {
-        return null;
+        return Collections.unmodifiableCollection(referenceColumns);
     }
 
     @Override
     public String getExpression() {
-        return null;
+        return expression;
     }
 
+    static class Embryo {
 
-    void setType(int t) {
-        switch (t) {
-            case Constraint.CHECK:
-            case Constraint.PRIMARY_KEY:
-            case Constraint.FOREIGN_KEY:
-            case Constraint.UNIQUE:
-                this.type = t;
-                break;
-            default:
-                throw new InternalError("Ошибка при создании объекта Constraint. Неизвестный тип ограничения: " + t);
+        private String name;
+        private int type;
+        private TableImage table;
+        private String expression;
+        private Collection<ColumnImage> columns;
+        private TableImage referenceTable;
+        private Collection<ColumnImage> referenceColumns;
+
+        Embryo() {}
+
+        Embryo setTable(TableImage t) {
+            this.table = t;
+            return this;
+        }
+
+        Embryo setConstraintName(String n) {
+            this.name = n;
+            return this;
+        }
+
+        Embryo setType(int t) {
+            switch (t) {
+                case Constraint.CHECK:
+                case Constraint.PRIMARY_KEY:
+                case Constraint.FOREIGN_KEY:
+                case Constraint.UNIQUE:
+                    this.type = t;
+                    break;
+                default:
+                    throw new InternalError("Ошибка при создании объекта Constraint. Неизвестный тип ограничения: " + t);
+            }
+            return this;
+        }
+
+        Embryo setColumns(Collection<ColumnImage> cols) {
+            if (columns == null) columns = new ArrayList<>();
+            columns.addAll(cols);
+            return this;
+        }
+
+        Embryo setColumn(ColumnImage column) {
+            if (columns == null) columns = new ArrayList<>();
+            columns.add(column);
+            return this;
+        }
+
+        Embryo setExpression(String expression) {
+            this.expression = expression;
+            return this;
+        }
+
+        Embryo setReferenceTable(TableImage table) {
+            this.referenceTable = table;
+            return this;
+        }
+
+        Embryo setReferenceColumns(Collection<ColumnImage> cols) {
+            if(referenceColumns == null) referenceColumns = new ArrayList<>();
+            referenceColumns.addAll(cols);
+            return this;
+        }
+
+        Embryo setReferenceColumn(ColumnImage col) {
+            if(referenceColumns == null) referenceColumns = new ArrayList<>();
+            referenceColumns.add(col);
+            return this;
+        }
+
+        public boolean isMature() {
+            if (isNot(isAssign(type))) return false;
+            if (name == null || name.equals("")) return false;
+            if (table == null) return false;
+            switch (type) {
+                case Constraint.CHECK:
+                    return isNot((expression == null || expression.equals("")));
+                case Constraint.UNIQUE:
+                case Constraint.PRIMARY_KEY:
+                    return isNot(columns == null || columns.isEmpty());
+                case Constraint.FOREIGN_KEY:
+                    break;
+                default:
+                    throw new InternalError("Ошибка при создании объекта Constraint. Неизвестный тип ограничения: "
+                            + type);
+            }
+            return false;
+        }
+
+        private boolean isAssign(int type) {
+            if (type == Constraint.UNIQUE) return true;
+            if (type == Constraint.CHECK) return true;
+            if (type == Constraint.PRIMARY_KEY) return true;
+            if (type == Constraint.FOREIGN_KEY) return true;
+            return false;
         }
     }
 
-    void setTable(TableImage t) {
-        this.table = t;
-    }
-
-    void setConstraintName(String n) {
-        this.name = n;
-    }
-
-    void setColumns(Collection<ColumnImage> cols) {
-        columns = new ArrayList<>();
-        columns.addAll(cols);
-    }
 }

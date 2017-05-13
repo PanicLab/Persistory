@@ -6,20 +6,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Экземпляр данного класса инкапсулирует настройки системы в целом. Предполагается, что настройки будут различными для
- * каждой СУБД, при этом базироваться они будут на неких общих, свойственной системе в целом, настройках. Предполагается,
- * что будет существовать лишь один экземпляр класса для каждой СУБД.
+ * Реализация интерфейса Configuration. Экземпляр класса является неизменяемым, его использование безопасно в
+ * многопоточной среде.
  */
-public final class ConfigurationImpl implements Configuration {
+final class ConfigurationImpl implements Configuration {
     private final Map<String, String> properties;
 
     private ConfigurationImpl() {
         throw new InternalError("Создание экземпляра подобным способом запрещено.");
     }
 
-    ConfigurationImpl(ConfigHelper helper) {
-        this.properties = helper.properties;
-        helper.properties = null;
+    private ConfigurationImpl(ConfigurationImpl.Builder builder) {
+        this.properties = builder.properties;
+        builder.properties = null;
     }
 
     /**
@@ -36,14 +35,31 @@ public final class ConfigurationImpl implements Configuration {
     }
 
 
-    static class ConfigHelper {
+    final static class Builder {
+
         private Map<String, String> properties = new HashMap<>();
 
-        ConfigHelper() {
+        Builder() {}
+
+
+        /**
+         * Метод задает параметр конфигурации и его значение.
+         * @param property: один из параметров конфигурации.
+         * @param value: значение параметра конфигурации
+         */
+        Builder set(String property, String value) {
+            properties.put(property,value);
+            return this;
         }
 
-        void set(String property, String value) {
-            properties.put(property, value);
+
+        //TODO не реализовано
+        Builder add(String property, String value) {
+            return this;
+        }
+
+        Configuration create() {
+            return new ConfigurationImpl(this);
         }
     }
 }

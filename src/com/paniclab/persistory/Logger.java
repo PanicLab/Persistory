@@ -1,7 +1,6 @@
 package com.paniclab.persistory;
 
 import com.paniclab.persistory.configuration.Configuration;
-import com.paniclab.persistory.configuration.ConfigurationImpl;
 
 import java.io.*;
 import java.nio.file.*;
@@ -62,19 +61,19 @@ public class Logger {
         this.dest = dest;
     }
 
-    public Logger(ConfigurationImpl conf) {
+    public Logger(Configuration conf) {
         this(conf.get(Configuration.MODE));
         this.dest = SYS_OUT;
     }
 
-    public Logger(ConfigurationImpl conf, int dest) {
+    public Logger(Configuration conf, int dest) {
         this(conf.get(Configuration.MODE), dest);
     }
 
 
     public Path getLogPath() {
         return Paths.get(Utils.getApplicationURI(this))
-                .resolve(Configuration.DEFAULT_CONFIG)
+                .resolve(Configuration.DEFAULT_CONFIG_PATH)
                 .getParent()
                 .resolveSibling(RELATIVE_LOG_PATH);
     }

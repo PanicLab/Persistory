@@ -5,6 +5,7 @@ import com.paniclab.persistory.annotations.JoinForeignKeyColumn;
 import com.paniclab.persistory.annotations.Linked;
 import com.paniclab.persistory.annotations.OnDelete;
 import com.paniclab.persistory.configuration.Configuration;
+import com.paniclab.persistory.configuration.ConfigurationFactory;
 
 
 import java.nio.file.Path;
@@ -32,19 +33,21 @@ public class Main {
         Configuration cfg = Configuration.builder()
                 .add("ss", "ss")
                 .set(Configuration.MODE, Configuration.PRODUCTION)
+                .setApplicationMode(Configuration.PRODUCTION)
                 .create();
 
-        //cfg.get(MODE);
+        Configuration another = new ConfigurationFactory().set("asfdad", "dasdad").create();
+
 
         Path somePath = Paths.get("logs", "log.log");
         System.out.println("Путь для логов: " + somePath);
 
-        System.out.println("Путь к файлу конфигурации: " + Configuration.DEFAULT_CONFIG);
+        System.out.println("Путь к файлу конфигурации: " + Configuration.DEFAULT_CONFIG_PATH);
 
-        Path newPath = Configuration.DEFAULT_CONFIG.getParent().relativize(somePath);
+        Path newPath = Configuration.DEFAULT_CONFIG_PATH.getParent().relativize(somePath);
         System.out.println("Относительный путь: " + newPath);
 
-        newPath = Configuration.DEFAULT_CONFIG.getParent().resolveSibling(somePath);
+        newPath = Configuration.DEFAULT_CONFIG_PATH.getParent().resolveSibling(somePath);
         System.out.println("Получается следующий путь:");
         System.out.println(newPath);
 
