@@ -4,6 +4,7 @@ import com.paniclab.persistory.InternalError;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Реализация интерфейса Configuration. Экземпляр класса является неизменяемым, его использование безопасно в
@@ -18,7 +19,6 @@ final class ConfigurationImpl implements Configuration {
 
     private ConfigurationImpl(ConfigurationImpl.Builder builder) {
         this.properties = builder.properties;
-        builder.properties = null;
     }
 
     /**
@@ -34,12 +34,28 @@ final class ConfigurationImpl implements Configuration {
         return value;
     }
 
+    @Override
+    public int hashCode() {
+        return properties.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null) return false;
+        if(!(obj instanceof ConfigurationImpl)) return false;
+        ConfigurationImpl other = ConfigurationImpl.class.cast(obj);
+        return this.properties.equals(other.properties);
+    }
+
 
     final static class Builder {
 
-        private Map<String, String> properties = new HashMap<>();
+        private final Map<String, String> properties;
 
-        Builder() {}
+        Builder(Map<String, String> map) {
+            this.properties = map;
+        }
 
 
         /**

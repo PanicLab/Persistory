@@ -42,4 +42,8 @@ public interface Configuration {
     static ConfigurationFactory builder() {
         return new ConfigurationFactory();
     }
+
+    static Configuration getCurrent() {
+        return new ConfigurationFactory().getCurrent();
+    }
 }

@@ -8,9 +8,10 @@ import com.paniclab.persistory.InternalError;
 public class ConfigurationFactory {
 
     private ConfigurationImpl.Builder builder;
+    private Secretary secretary = new Secretary();
+    private static boolean alreadyCreated;
 
     public ConfigurationFactory() {
-        Secretary secretary = new Secretary();
         builder = secretary.getDefaults();
     }
 
@@ -40,6 +41,12 @@ public class ConfigurationFactory {
     }
 
     public Configuration create() {
+        secretary.saveCurrent();
+        alreadyCreated = true;
         return builder.create();
+    }
+
+    public Configuration getCurrent() {
+        return secretary.loadCurrent().create();
     }
 }

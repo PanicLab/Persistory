@@ -42,4 +42,38 @@ public class ConfigurationTest {
         String value = cfg.get("XXXX");
     }
 
+    @Test
+    public void config_equals() throws Exception {
+        cfg = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+
+        Configuration other = Configuration.builder().create();
+        assertNotEquals(cfg, other);
+
+        Configuration anotherOne = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+        assertEquals(cfg, anotherOne);
+    }
+
+    @Test
+    public void createConfig_equals_but_not_identities() throws Exception {
+        cfg = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+        Configuration anotherOne = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+        assertEquals(cfg, anotherOne);
+        assertFalse(cfg == anotherOne);
+    }
+
+    @Test
+    public void getCurrent_equals_but_not_identities() throws Exception {
+        cfg = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+
+        Configuration other = Configuration.getCurrent();
+        assertEquals(cfg, other);
+        assertFalse(cfg == other);
+
+        Configuration anotherOne = Configuration.getCurrent();
+        assertEquals(anotherOne, other);
+        assertFalse(anotherOne == other);
+    }
+
+
+
 }
