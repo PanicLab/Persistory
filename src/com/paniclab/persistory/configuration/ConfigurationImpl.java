@@ -2,9 +2,8 @@ package com.paniclab.persistory.configuration;
 
 import com.paniclab.persistory.InternalError;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
 
 /**
  * Реализация интерфейса Configuration. Экземпляр класса является неизменяемым, его использование безопасно в
@@ -72,7 +71,7 @@ final class ConfigurationImpl implements Configuration {
         void add(String property, String value) {
         }
 
-        Configuration create() {
+        Configuration build() {
             return new ConfigurationImpl(this);
         }
     }

@@ -39,25 +39,26 @@ import static com.paniclab.persistory.Utils.isNot;
  */
 public class Logger {
 
-    public static final int TO_FILE = 1;
+    public static final int FILE = 1;
     public static final int SYS_OUT = 2;
-    public static final int SYS_ERR = 3;
+    public static final int SYS_ERR = 4;
+    public static final int PRINT_WRITER = 8;
     public static final Path RELATIVE_LOG_PATH = Paths.get("logs", "log.log");
 
-    private String execMode;
+    private String appMode;
     private int dest;
 
 
     Logger() {
     }
 
-    Logger(String execMode) {
-        this.execMode = execMode;
+    Logger(String appMode) {
+        this.appMode = appMode;
         this.dest = SYS_OUT;
     }
 
-    Logger(String execMode, int dest) {
-        this.execMode = execMode;
+    Logger(String appMode, int dest) {
+        this.appMode = appMode;
         this.dest = dest;
     }
 
@@ -100,7 +101,7 @@ public class Logger {
 
     private void log(String message) {
         switch (dest) {
-            case Logger.TO_FILE:
+            case Logger.FILE:
                 logToFile(message);
                 break;
             case Logger.SYS_OUT:
@@ -161,13 +162,13 @@ public class Logger {
 
 
     public void logOnDevelop(String message) {
-        if(execMode.equals(Configuration.PRODUCTION)) return;
+        if(appMode.equals(Configuration.PRODUCTION)) return;
         log(message);
     }
 
     public void logOnDebug(String message) {
-        if(execMode.equals(Configuration.PRODUCTION)) return;
-        if(execMode.equals(Configuration.DEVELOPING)) return;
+        if(appMode.equals(Configuration.PRODUCTION)) return;
+        if(appMode.equals(Configuration.DEVELOPING)) return;
         log(message);
     }
 
@@ -177,7 +178,7 @@ public class Logger {
 
     private void log(String message, Object...objects) {
         switch (dest) {
-            case Logger.TO_FILE:
+            case Logger.FILE:
                 logToFile(parseMessage(message, objects));
                 break;
             case Logger.SYS_OUT:
@@ -192,13 +193,13 @@ public class Logger {
     }
 
     public void logOnDevelop(String message, Object...objects) {
-        if(execMode.equals(Configuration.PRODUCTION)) return;
+        if(appMode.equals(Configuration.PRODUCTION)) return;
         log(message, objects);
     }
 
     public void logOnDebug(String message, Object...objects) {
-        if(execMode.equals(Configuration.PRODUCTION)) return;
-        if(execMode.equals(Configuration.DEVELOPING)) return;
+        if(appMode.equals(Configuration.PRODUCTION)) return;
+        if(appMode.equals(Configuration.DEVELOPING)) return;
         log(message, objects);
     }
 
@@ -210,5 +211,54 @@ public class Logger {
             message = message.replace(sub, String.valueOf(objects[x-1]));
         }
         return message;
+    }
+
+    public static class Builder {
+
+        private int dest;
+        private String name = "";
+        private PrintWriter printWriter;
+        private PrintStream printStream;
+        private boolean alreadySet;
+
+
+        private Builder() {}
+
+        public Logger.Builder setDestination(int file) {
+            if(alreadySet) throw new InternalError("Пункт назначения логгера уже назначен");
+            switch (file) {
+                case Logger.FILE:
+                    dest = Logger.FILE;
+                    break;
+                case Logger.SYS_OUT:
+                    dest = Logger.SYS_OUT;
+                    break;
+                case Logger.SYS_ERR:
+                    dest = Logger.SYS_ERR;
+                    break;
+                case Logger.PRINT_WRITER:
+                    dest = Logger.PRINT_WRITER;
+                default:
+                    throw new InternalError("Неизвестный тип логгера: " + file);
+            }
+            alreadySet = true;
+            return this;
+        }
+
+        public Logger.Builder setDestination(PrintWriter pw) {
+            if(alreadySet) throw new InternalError("Пункт назначения логгера уже назначен");
+            alreadySet = true;
+            printWriter = pw;
+            return this;
+        }
+
+        public Logger.Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Logger build() {
+            return new Logger();
+        }
     }
 }

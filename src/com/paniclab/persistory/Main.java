@@ -61,7 +61,7 @@ public class Main {
        //logger.log("Это сообщение появляется всегда");
         logger.logOnDevelop("Еще одно сообщение");
 
-        Logger fileLogger = new Logger(Configuration.DEBUG, Logger.TO_FILE);
+        Logger fileLogger = new Logger(Configuration.DEBUG, Logger.FILE);
         fileLogger.log(Configuration.DEVELOPING, "Hello");
 
         logger.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");

@@ -9,7 +9,7 @@ public class ConfigurationFactory {
 
     private ConfigurationImpl.Builder builder;
     private Secretary secretary = new Secretary();
-    private static boolean alreadyCreated;
+    private static boolean alreadyCreated = false;
 
     public ConfigurationFactory() {
         builder = secretary.getDefaults();
@@ -43,10 +43,11 @@ public class ConfigurationFactory {
     public Configuration create() {
         secretary.saveCurrent();
         alreadyCreated = true;
-        return builder.create();
+        return builder.build();
     }
 
     public Configuration getCurrent() {
-        return secretary.loadCurrent().create();
+        if(!alreadyCreated) throw new InternalError("Нельзя получить текущие настройки, не создав их");
+        return secretary.loadCurrent().build();
     }
 }

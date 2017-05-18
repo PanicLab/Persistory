@@ -3,6 +3,7 @@ package com.paniclab.persistory.configuration;
 import com.paniclab.persistory.InternalError;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -72,6 +73,12 @@ public class ConfigurationTest {
         Configuration anotherOne = Configuration.getCurrent();
         assertEquals(anotherOne, other);
         assertFalse(anotherOne == other);
+    }
+
+    @Ignore
+    @Test(expected = InternalError.class)
+    public void getCurrent_config_without_creating_it_first() throws Exception {
+        cfg = Configuration.getCurrent();
     }
 
 

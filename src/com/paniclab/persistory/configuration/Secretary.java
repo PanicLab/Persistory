@@ -86,10 +86,10 @@ class Secretary {
 
     private String getConfigAsText() {
         StringBuilder sb = new StringBuilder();
+        String separator = System.lineSeparator();
         for (Map.Entry<String, String> entry: configMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            String separator = System.lineSeparator();
             sb.append(key).append("=").append(value).append(separator);
         }
         return sb.toString();

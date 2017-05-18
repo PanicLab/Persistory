@@ -1,19 +1,10 @@
 package com.paniclab.persistory.table.constraint;
 
 import com.paniclab.persistory.InternalError;
-import com.paniclab.persistory.Utils;
-import com.paniclab.persistory.configuration.Configuration;
-import com.paniclab.persistory.configuration.ConfigurationImpl;
 import com.paniclab.persistory.table.ColumnImage;
 import com.paniclab.persistory.table.TableImage;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.*;
 
 import static com.paniclab.persistory.Utils.isNot;
