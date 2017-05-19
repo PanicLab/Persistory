@@ -17,21 +17,21 @@ public class ConstraintBuilder {
 
     public UniqueConstraint getUniqueConstraint(TableImage table) {
 
-        ConstraintImpl.Embryo embryo =
-                new ConstraintImpl.Embryo().setType(Constraint.UNIQUE)
+        ConstraintImpl.Chrysalis chrysalis =
+                new ConstraintImpl.Chrysalis().setType(Constraint.UNIQUE)
                                             .setTable(table)
                                             .setConstraintName(nameDispatcher.getUniqueConstraintName(table))
                                             .setColumns(table.getUniqueColumns());
-        return new ConstraintImpl(embryo);
+        return new ConstraintImpl(chrysalis);
     }
 
     public CheckConstraint getCheckConstraint(TableImage table) {
-        ConstraintImpl.Embryo embryo =
-                new ConstraintImpl.Embryo().setType(Constraint.UNIQUE)
+        ConstraintImpl.Chrysalis chrysalis =
+                new ConstraintImpl.Chrysalis().setType(Constraint.UNIQUE)
                                             .setTable(table)
                                             .setConstraintName(nameDispatcher.getUniqueConstraintName(table))
                                             .setExpression(getCheckExpression(table));
-        return new ConstraintImpl(embryo);
+        return new ConstraintImpl(chrysalis);
     }
 
     //TODO дописать метод, выдернув выражение из аннотации

@@ -12,6 +12,7 @@ import static com.paniclab.persistory.Utils.isNot;
 /**
  * Created by Сергей on 09.05.2017.
  */
+
 public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, ForeignKeyConstraint, CheckConstraint {
 
     private String name;
@@ -26,14 +27,14 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private ConstraintImpl() {}
 
 
-    ConstraintImpl(Embryo embryo) {
-        this.name = embryo.name;
-        this.type = embryo.type;
-        this.table = embryo.table;
-        this.expression = embryo.expression;
-        this.columns = embryo.columns;
-        this.referenceTable = embryo.referenceTable;
-        this.referenceColumns = embryo.referenceColumns;
+    ConstraintImpl(Chrysalis chrysalis) {
+        this.name = chrysalis.name;
+        this.type = chrysalis.type;
+        this.table = chrysalis.table;
+        this.expression = chrysalis.expression;
+        this.columns = chrysalis.columns;
+        this.referenceTable = chrysalis.referenceTable;
+        this.referenceColumns = chrysalis.referenceColumns;
     }
 
     @Override
@@ -71,7 +72,7 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
         return expression;
     }
 
-    static class Embryo {
+    static class Chrysalis {
 
         private String name;
         private int type;
@@ -81,19 +82,19 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
         private TableImage referenceTable;
         private Collection<ColumnImage> referenceColumns;
 
-        Embryo() {}
+        Chrysalis() {}
 
-        Embryo setTable(TableImage t) {
+        Chrysalis setTable(TableImage t) {
             this.table = t;
             return this;
         }
 
-        Embryo setConstraintName(String n) {
+        Chrysalis setConstraintName(String n) {
             this.name = n;
             return this;
         }
 
-        Embryo setType(int t) {
+        Chrysalis setType(int t) {
             switch (t) {
                 case Constraint.CHECK:
                 case Constraint.PRIMARY_KEY:
@@ -107,35 +108,35 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
             return this;
         }
 
-        Embryo setColumns(Collection<ColumnImage> cols) {
+        Chrysalis setColumns(Collection<ColumnImage> cols) {
             if (columns == null) columns = new ArrayList<>();
             columns.addAll(cols);
             return this;
         }
 
-        Embryo setColumn(ColumnImage column) {
+        Chrysalis setColumn(ColumnImage column) {
             if (columns == null) columns = new ArrayList<>();
             columns.add(column);
             return this;
         }
 
-        Embryo setExpression(String expression) {
+        Chrysalis setExpression(String expression) {
             this.expression = expression;
             return this;
         }
 
-        Embryo setReferenceTable(TableImage table) {
+        Chrysalis setReferenceTable(TableImage table) {
             this.referenceTable = table;
             return this;
         }
 
-        Embryo setReferenceColumns(Collection<ColumnImage> cols) {
+        Chrysalis setReferenceColumns(Collection<ColumnImage> cols) {
             if(referenceColumns == null) referenceColumns = new ArrayList<>();
             referenceColumns.addAll(cols);
             return this;
         }
 
-        Embryo setReferenceColumn(ColumnImage col) {
+        Chrysalis setReferenceColumn(ColumnImage col) {
             if(referenceColumns == null) referenceColumns = new ArrayList<>();
             referenceColumns.add(col);
             return this;
