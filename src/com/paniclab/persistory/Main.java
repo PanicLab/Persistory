@@ -55,7 +55,7 @@ public class Main {
         Logger logger = new Logger(Configuration.PRODUCTION);
         System.out.println();
         System.out.println("Абсолютный путь для логов:");
-        System.out.println(logger.getLogPath());
+        System.out.println(logger.getDefaultLogPath());
 
         logger.log(Configuration.DEVELOPING, "Это лог сообщение");
        //logger.log("Это сообщение появляется всегда");

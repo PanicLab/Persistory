@@ -15,12 +15,12 @@ import static com.paniclab.persistory.Utils.isNot;
  * Простенький логгер для местного использования. Может писать логи в файл, System.out или System.err по выбору. По
  * умолчанию пишет System.out. Выбор этот задается однажды при создании экземпляра и более не изменяется. Для создания
  * экземпляра необходимо передать конструктору в качестве аргумента объект типа Configuration. Второй необязательный
- * аргумент это одна из трех констант - Logger.TO_FILE, Logger.SYS_OUT или Logger.SYS_ERR. Enumeration не используется,
+ * аргумент это одна из трех констант - logger.TO_FILE, logger.SYS_OUT или logger.SYS_ERR. Enumeration не используется,
  * поскольку не рекомендуется их использование в Android.
  *
- *              Logger fileLogger = new Logger(pm.getConfig(), Logger.TO_FILE);
+ *              logger fileLogger = new logger(pm.getConfig(), logger.TO_FILE);
  *              ...
- *              Logger logger = new Logger(pm.getConfig);                       // Logger.SYS_OUT
+ *              logger logger = new logger(pm.getConfig);                       // logger.SYS_OUT
  *
  * При выводе лог-сообщения следует указать режим запуска приложения, при котором данный лог будет отображаться -
  * Configuration.PRODUCTION, Configuration.DEVELOPING или Configuration.DEBUG. К примеру, если приложение запущено в
@@ -72,7 +72,7 @@ public class Logger {
     }
 
 
-    public Path getLogPath() {
+    public Path getDefaultLogPath() {
         return Paths.get(Utils.getApplicationURI(this))
                 .resolve(Configuration.DEFAULT_CONFIG_PATH)
                 .getParent()
@@ -116,7 +116,7 @@ public class Logger {
     }
 
     private void logToFile(String message) {
-        Path dir = Paths.get(getLogPath().getParent().toUri());
+        Path dir = Paths.get(getDefaultLogPath().getParent().toUri());
         if (Files.notExists(dir)) {
             boolean success = dir.toFile().mkdirs();
             if (isNot(success)) {
@@ -124,7 +124,7 @@ public class Logger {
             }
         }
 
-        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(getLogPath(),
+        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(getDefaultLogPath(),
                                                         StandardOpenOption.CREATE,
                                                         StandardOpenOption.APPEND))){
             pw.println();
@@ -213,7 +213,7 @@ public class Logger {
         return message;
     }
 
-    public static class Builder {
+    static class Builder {
 
         private int dest;
         private String name = "";
@@ -236,8 +236,6 @@ public class Logger {
                 case Logger.SYS_ERR:
                     dest = Logger.SYS_ERR;
                     break;
-                case Logger.PRINT_WRITER:
-                    dest = Logger.PRINT_WRITER;
                 default:
                     throw new InternalError("Неизвестный тип логгера: " + file);
             }
