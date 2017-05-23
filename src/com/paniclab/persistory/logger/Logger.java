@@ -8,10 +8,9 @@ import com.paniclab.persistory.configuration.Configuration;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,78 +21,63 @@ import static com.paniclab.persistory.Utils.isNot;
 /**
  * Created by Сергей on 19.05.2017.
  */
-public abstract class Logger {
+public class Logger {
 
-    public static final int FILE = 1;
-    public static final int PRINT_STREAM = 2;
-    public static final int PRINT_WRITER = 4;
-    public static final Path RELATIVE_LOG_PATH = Paths.get("logs", "log.log");
+    private static final int FILE = 1;
+    private static final int PRINT_STREAM = 2;
+    private static final int PRINT_WRITER = 4;
+    private static final Path RELATIVE_LOG_PATH = Paths.get("logs", "log.log");
 
     private String appMode;
     private int dest;
     private String name = "";
     private PrintStream printStream;
     private PrintWriter printWriter;
+    private Path path;
 
     private Logger(Logger.Builder builder) {
         this.appMode = Configuration.getCurrent().get("MODE");
         this.name = builder.name;
         this.dest = builder.dest;
+        this.path = builder.path;
         this.printStream = builder.printStream;
         this.printWriter = builder.printWriter;
     }
 
-    public static Logger.Builder newFileLogger() {
-        return new LoggerFactory().getFileLogger();
+    public static Logger.Builder customFileLogger(Object obj) {
+        return new Logger.Builder().setDefaultName(obj)
+                                   .setDefaultDest(Logger.FILE);
     }
 
-    public static Logger.Builder newLogger(PrintStream ps) {
-        return new LoggerFactory().getLogger(ps);
+    public static Logger newFileLogger(Object obj) {
+        return new Logger.Builder().setDefaultName(obj)
+                                   .setDefaultDest(Logger.FILE)
+                                   .build();
     }
 
-    public static Logger.Builder newLogger(PrintWriter pw) {
-        return null;
+    public static Logger.Builder customLogger(Object obj) {
+        return new Logger.Builder().setDefaultName(obj);
     }
 
-
-    protected void log(String message) {
-        switch (dest) {
-            case FILE:
-                toFile(message);
-                break;
-            case PRINT_STREAM:
-                log(printStream, message);
-                break;
-            case PRINT_WRITER:
-                log(printWriter, message);
-            default:
-                throw new InternalError("Неизвестный тип логгера: " + dest);
-        }
+    public static Logger newLogger(Object obj) {
+        return new Logger.Builder().setDefaultName(obj)
+                                   .setDefaultDest(Logger.PRINT_STREAM)
+                                   .build();
     }
 
 
-    protected void log(String message, Object...objects) {
-        message = parseMessage(message, objects);
-        log(message);
+    private static Path getDefaultLogPath(Object obj) {
+        return Paths.get(Utils.getApplicationURI(obj))
+                .resolve(Configuration.DEFAULT_CONFIG_PATH)
+                .getParent()
+                .resolveSibling(RELATIVE_LOG_PATH);
     }
 
-
-    protected void log(String level, String message) {
-        switch (level) {
-            case Configuration.PRODUCTION:
-                log(message);
-                break;
-            case Configuration.DEVELOPING:
-                logDev(message);
-                break;
-            case Configuration.DEBUG:
-                logDebug(message);
-                break;
-            default:
-                throw new InternalError("Неизвестный режим запуска приложения: " + level);
-        }
+    String getName() {
+        return name;
     }
-    protected void log(String level, String message, Object...objects) {
+
+    public void log(String level, String message, Object...objects) {
         switch (level) {
             case Configuration.PRODUCTION:
                 log(message, objects);
@@ -109,40 +93,9 @@ public abstract class Logger {
         }
     }
 
-    public void toFile(String message) {
-        Path dir = Paths.get(getDefaultLogPath().getParent().toUri());
-        if (Files.notExists(dir)) {
-            boolean success = dir.toFile().mkdirs();
-            if (isNot(success)) {
-                throw new LoggingException("Не удалось создать каталог лог-файла");
-            }
-        }
 
-        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(getDefaultLogPath(),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND))){
-            pw.println();
-            long timeMillis = System.currentTimeMillis();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), ZoneId.systemDefault());
-
-            pw.println("Message " + time.format(formatter) + ": ");
-            pw.println(message);
-        } catch (IOException e) {
-            throw new LoggingException("Ошибка при записи лог-файла.", e);
-        }
-    }
-
-    public Path getDefaultLogPath() {
-        return Paths.get(Utils.getApplicationURI(this))
-                .resolve(Configuration.DEFAULT_CONFIG_PATH)
-                .getParent()
-                .resolveSibling(RELATIVE_LOG_PATH);
-    }
-
-
-    public  void logDev(String message) {
-        if(appMode.equals(Configuration.PRODUCTION)) return;
+    public void log(String message, Object...objects) {
+        message = parseMessage(message, objects);
         log(message);
     }
 
@@ -153,6 +106,52 @@ public abstract class Logger {
     }
 
 
+    public  void logDebug(String message, Object...objects) {
+        if(appMode.equals(Configuration.PRODUCTION)) return;
+        if(appMode.equals(Configuration.DEVELOPING)) return;
+        log(message, objects);
+    }
+
+
+    public void log(String level, String message) {
+        switch (level) {
+            case Configuration.PRODUCTION:
+                log(message);
+                break;
+            case Configuration.DEVELOPING:
+                logDev(message);
+                break;
+            case Configuration.DEBUG:
+                logDebug(message);
+                break;
+            default:
+                throw new InternalError("Неизвестный режим запуска приложения: " + level);
+        }
+    }
+
+
+    private void log(String message) {
+        switch (dest) {
+            case FILE:
+                toFile(message);
+                break;
+            case PRINT_STREAM:
+                log(printStream, message);
+                break;
+            case PRINT_WRITER:
+                log(printWriter, message);
+            default:
+                throw new InternalError("Неизвестный тип логгера: " + dest);
+        }
+    }
+
+
+    public  void logDev(String message) {
+        if(appMode.equals(Configuration.PRODUCTION)) return;
+        log(message);
+    }
+
+
     public void logDebug(String message) {
         if(appMode.equals(Configuration.PRODUCTION)) return;
         if(appMode.equals(Configuration.DEVELOPING)) return;
@@ -160,10 +159,27 @@ public abstract class Logger {
     }
 
 
-    public  void logDebug(String message, Object...objects) {
-        if(appMode.equals(Configuration.PRODUCTION)) return;
-        if(appMode.equals(Configuration.DEVELOPING)) return;
-        log(message, objects);
+    private void toFile(String message) {
+        if (Files.notExists(path)) {
+            boolean success = path.toFile().mkdirs();
+            if (isNot(success)) {
+                throw new LoggingException("Не удалось создать каталог лог-файла");
+            }
+        }
+
+        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(getDefaultLogPath(this),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND))){
+            pw.println();
+            long timeMillis = System.currentTimeMillis();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis), ZoneId.systemDefault());
+
+            pw.println(name + " " + time.format(formatter) + ": ");
+            pw.println(message);
+        } catch (IOException e) {
+            throw new LoggingException("Ошибка при записи лог-файла.", e);
+        }
     }
 
 
@@ -188,33 +204,59 @@ public abstract class Logger {
     }
 
 
-    protected abstract static class Builder {
+    public static class Builder {
         private int dest;
         private String name = "";
         private PrintStream printStream;
         private PrintWriter printWriter;
+        private Path path;
 
-        protected Builder() {}
+        private Builder() {}
 
         public Logger.Builder setName(String name) {
             this.name = name;
             return this;
         }
 
+        private Logger.Builder setDefaultName(Object obj) {
+            name = "@" + obj.hashCode() + " " + obj.getClass().getSimpleName();
+            return this;
+        }
 
-        public Logger.Builder setDestination(int d) {
-            if(this.dest != 0) throw new InternalError("Невозможно перезадать уже заданный параметр");
-            switch (d) {
+        public Logger.Builder setDestination(String logPath) {
+            if(printStream != null) throw new InternalError("Этот экземпляру уже задан PrintStream для вывода " +
+                    "сообщений");
+            if(printWriter != null) throw new InternalError("Этот экземпляру уже задан PrintWriter для вывода " +
+                    "сообщений");
+
+            dest = Logger.FILE;
+
+            URI uri;
+            try {
+                uri = new URI(logPath);
+            } catch (URISyntaxException e) {
+                throw new InternalError("Невозможно создать лог файл. Путь к файлу задан неверно."
+                        + System.lineSeparator() + "Путь: " + logPath, e);
+            }
+            path = Paths.get(uri);
+
+            return this;
+        }
+
+        private Logger.Builder setDefaultDest(int dest) {
+            switch (dest) {
                 case Logger.FILE:
-                    dest = Logger.FILE;
+                    this.dest = dest;
+                    this.path = Logger.getDefaultLogPath(this);
                     break;
                 case Logger.PRINT_STREAM:
-                    dest = Logger.PRINT_STREAM;
+                    this.dest = dest;
+                    this.printStream = System.out;
                     break;
                 case Logger.PRINT_WRITER:
-                    dest = Logger.PRINT_WRITER;
+                    throw new InternalError("Невозможно установить данный тип логгера по умолчанию: " + dest);
                 default:
-                    throw new InternalError("Неизвестный тип логгера: " + d);
+                    throw new InternalError("Неизвестный тип логгера: " + dest);
             }
             return this;
         }
@@ -237,6 +279,8 @@ public abstract class Logger {
             return this;
         }
 
-        public abstract Logger build();
+        public Logger build() {
+            return new Logger(this);
+        }
     }
 }

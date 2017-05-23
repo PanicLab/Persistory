@@ -37,7 +37,7 @@ import static com.paniclab.persistory.Utils.isNot;
  *
  *
  */
-public class Logger {
+public class LoggerOld {
 
     public static final int FILE = 1;
     public static final int SYS_OUT = 2;
@@ -49,25 +49,25 @@ public class Logger {
     private int dest;
 
 
-    Logger() {
+    LoggerOld() {
     }
 
-    Logger(String appMode) {
+    LoggerOld(String appMode) {
         this.appMode = appMode;
         this.dest = SYS_OUT;
     }
 
-    Logger(String appMode, int dest) {
+    LoggerOld(String appMode, int dest) {
         this.appMode = appMode;
         this.dest = dest;
     }
 
-    public Logger(Configuration conf) {
+    public LoggerOld(Configuration conf) {
         this(conf.get(Configuration.MODE));
         this.dest = SYS_OUT;
     }
 
-    public Logger(Configuration conf, int dest) {
+    public LoggerOld(Configuration conf, int dest) {
         this(conf.get(Configuration.MODE), dest);
     }
 
@@ -101,13 +101,13 @@ public class Logger {
 
     private void log(String message) {
         switch (dest) {
-            case Logger.FILE:
+            case LoggerOld.FILE:
                 logToFile(message);
                 break;
-            case Logger.SYS_OUT:
+            case LoggerOld.SYS_OUT:
                 log(System.out, message);
                 break;
-            case Logger.SYS_ERR:
+            case LoggerOld.SYS_ERR:
                 log(System.err, message);
                 break;
             default:
@@ -178,13 +178,13 @@ public class Logger {
 
     private void log(String message, Object...objects) {
         switch (dest) {
-            case Logger.FILE:
+            case LoggerOld.FILE:
                 logToFile(parseMessage(message, objects));
                 break;
-            case Logger.SYS_OUT:
+            case LoggerOld.SYS_OUT:
                 log(System.out, parseMessage(message, objects));
                 break;
-            case Logger.SYS_ERR:
+            case LoggerOld.SYS_ERR:
                 log(System.err, parseMessage(message, objects));
                 break;
             default:
@@ -224,17 +224,17 @@ public class Logger {
 
         private Builder() {}
 
-        public Logger.Builder setDestination(int file) {
+        public LoggerOld.Builder setDestination(int file) {
             if(alreadySet) throw new InternalError("Пункт назначения логгера уже назначен");
             switch (file) {
-                case Logger.FILE:
-                    dest = Logger.FILE;
+                case LoggerOld.FILE:
+                    dest = LoggerOld.FILE;
                     break;
-                case Logger.SYS_OUT:
-                    dest = Logger.SYS_OUT;
+                case LoggerOld.SYS_OUT:
+                    dest = LoggerOld.SYS_OUT;
                     break;
-                case Logger.SYS_ERR:
-                    dest = Logger.SYS_ERR;
+                case LoggerOld.SYS_ERR:
+                    dest = LoggerOld.SYS_ERR;
                     break;
                 default:
                     throw new InternalError("Неизвестный тип логгера: " + file);
@@ -243,20 +243,20 @@ public class Logger {
             return this;
         }
 
-        public Logger.Builder setDestination(PrintWriter pw) {
+        public LoggerOld.Builder setDestination(PrintWriter pw) {
             if(alreadySet) throw new InternalError("Пункт назначения логгера уже назначен");
             alreadySet = true;
             printWriter = pw;
             return this;
         }
 
-        public Logger.Builder setName(String name) {
+        public LoggerOld.Builder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Logger build() {
-            return new Logger();
+        public LoggerOld build() {
+            return new LoggerOld();
         }
     }
 }

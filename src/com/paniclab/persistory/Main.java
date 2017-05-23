@@ -21,13 +21,12 @@ import static com.paniclab.persistory.annotations.Linked.*;
         assotiation = ONE_TO_MANY,
         type = UNIDIRECTIONAL)
 
-@Linked(reference = Logger.class,
+@Linked(reference = LoggerOld.class,
         assotiation = ONE_TO_ONE,
         foreignKey = @JoinForeignKeyColumn(columnName = "niaM",
                 notNull = true,
                 onDelete = OnDelete.CASCADE))
 public class Main {
-
     public static void main(String[] args) {
 
         Configuration cfg = Configuration.builder()
@@ -52,18 +51,18 @@ public class Main {
         System.out.println(newPath);
 
         //Path absoluteLogPath = Paths.get(Utils.getApplicationURI(newPath));
-        Logger logger = new Logger(Configuration.PRODUCTION);
+        LoggerOld loggerOld = new LoggerOld(Configuration.PRODUCTION);
         System.out.println();
         System.out.println("Абсолютный путь для логов:");
-        System.out.println(logger.getDefaultLogPath());
+        System.out.println(loggerOld.getDefaultLogPath());
 
-        logger.log(Configuration.DEVELOPING, "Это лог сообщение");
+        loggerOld.log(Configuration.DEVELOPING, "Это лог сообщение");
        //logger.log("Это сообщение появляется всегда");
-        logger.logOnDevelop("Еще одно сообщение");
+        loggerOld.logOnDevelop("Еще одно сообщение");
 
-        Logger fileLogger = new Logger(Configuration.DEBUG, Logger.FILE);
-        fileLogger.log(Configuration.DEVELOPING, "Hello");
+        LoggerOld fileLoggerOld = new LoggerOld(Configuration.DEBUG, LoggerOld.FILE);
+        fileLoggerOld.log(Configuration.DEVELOPING, "Hello");
 
-        logger.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
+        loggerOld.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
     }
 }

@@ -1,7 +1,5 @@
 package com.paniclab.persistory;
 
-import com.paniclab.persistory.configuration.Configuration;
-
 /**
  * Created by Сергей on 09.05.2017.
  */
@@ -11,6 +9,8 @@ public interface PersistorManager {
 
 
     String getVendor();
-    public Configuration getConfig();
+    public Config getConfig();
     Dialect getDialect();
+
+    public interface Config {}
 }

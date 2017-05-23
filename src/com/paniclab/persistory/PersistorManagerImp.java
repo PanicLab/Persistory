@@ -1,14 +1,11 @@
 package com.paniclab.persistory;
 
-import com.paniclab.persistory.configuration.Configuration;
-import com.paniclab.persistory.configuration.ConfigurationImpl;
-
 /**
  * Created by Сергей on 09.05.2017.
  */
 public class PersistorManagerImp implements PersistorManager {
     private String vendor;
-    private Configuration config;
+    private PersistorManager.Config config;
 
     public PersistorManagerImp() {
         super();
@@ -24,7 +21,7 @@ public class PersistorManagerImp implements PersistorManager {
     }
 
     @Override
-    public Configuration getConfig() {
+    public PersistorManager.Config getConfig() {
         return config;
     }
 

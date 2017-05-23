@@ -46,12 +46,24 @@ public class ConfigurationTest {
     @Test
     public void config_equals() throws Exception {
         cfg = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
-
         Configuration other = Configuration.builder().create();
         assertNotEquals(cfg, other);
 
         Configuration anotherOne = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
         assertEquals(cfg, anotherOne);
+
+        assertTrue(cfg.equals(anotherOne));
+        assertTrue(anotherOne.equals(cfg));
+
+        Configuration z = Configuration.builder().setApplicationMode(Configuration.DEBUG).create();
+        assertTrue(anotherOne.equals(z));
+        assertTrue(cfg.equals(z));
+
+        Configuration nullable = null;
+        assertFalse(cfg.equals(nullable));
+        assertFalse(other.equals(nullable));
+        assertFalse(anotherOne.equals(nullable));
+        assertFalse(z.equals(nullable));
     }
 
     @Test

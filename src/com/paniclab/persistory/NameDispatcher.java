@@ -12,7 +12,7 @@ public class NameDispatcher {
 
     public NameDispatcher(PersistorManager pm) {
         persistorManager = pm;
-        configuration = pm.getConfig();
+        configuration = Configuration.getCurrent();
     }
 
     public String getTableName(Class<?> clazz) {
