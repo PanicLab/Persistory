@@ -1,5 +1,6 @@
 package com.paniclab.persistory.table.constraint;
 
+
 import com.paniclab.persistory.table.TableImage;
 
 
@@ -13,12 +14,14 @@ public interface Constraint {
     public static int FOREIGN_KEY = 100023;
     public static int CHECK = 100024;
 
-    static ConstraintBuilder builder() {
-        return new ConstraintBuilder();
+    static ConstraintFactory builder() {
+        return new ConstraintFactory();
     }
     public String getConstraintName();
     public TableImage getTable();
+    public String getTableName();
     public int getType();
 
     //public String getAlterTableExpression();
+
 }

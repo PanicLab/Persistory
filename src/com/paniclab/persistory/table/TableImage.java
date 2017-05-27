@@ -1,5 +1,6 @@
 package com.paniclab.persistory.table;
 
+
 import java.util.Collection;
 
 /**
@@ -10,4 +11,5 @@ public interface TableImage {
     public Class<?> getCorrespondingClass() throws Exception;
     boolean hasParent(); //таблица связана с другой посредством внешнего ключа или промежуточной таблицы
     public Collection<ColumnImage> getUniqueColumns();
+    public Collection<ColumnImage> getPrimaryKeyColumns();
 }

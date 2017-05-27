@@ -18,6 +18,7 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private String name;
     private int type;
     private TableImage table;
+    private String tableName;
     private String expression;
     private Collection<ColumnImage> columns;
     private TableImage referenceTable;
@@ -27,14 +28,15 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private ConstraintImpl() {}
 
 
-    ConstraintImpl(Chrysalis chrysalis) {
-        this.name = chrysalis.name;
-        this.type = chrysalis.type;
-        this.table = chrysalis.table;
-        this.expression = chrysalis.expression;
-        this.columns = chrysalis.columns;
-        this.referenceTable = chrysalis.referenceTable;
-        this.referenceColumns = chrysalis.referenceColumns;
+    private ConstraintImpl(Builder builder) {
+        this.name = builder.name;
+        this.type = builder.type;
+        this.table = builder.table;
+        this.tableName = builder.tableName;
+        this.expression = builder.expression;
+        this.columns = Collections.unmodifiableCollection(builder.columns);
+        this.referenceTable = builder.referenceTable;
+        this.referenceColumns = Collections.unmodifiableCollection(builder.referenceColumns);
     }
 
     @Override
@@ -53,8 +55,14 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     }
 
     @Override
+    public String getTableName() {
+        return tableName;
+    }
+
+
+    @Override
     public Collection<ColumnImage> getColumns() {
-        return Collections.unmodifiableCollection(columns);
+        return columns;
     }
 
     @Override
@@ -64,7 +72,7 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
 
     @Override
     public Collection<ColumnImage> getReferenceColumns() {
-        return Collections.unmodifiableCollection(referenceColumns);
+        return referenceColumns;
     }
 
     @Override
@@ -72,29 +80,55 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
         return expression;
     }
 
-    static class Chrysalis {
+    static class Builder implements ConstraintConstructingKit {
 
         private String name;
         private int type;
         private TableImage table;
+        private String tableName;
         private String expression;
         private Collection<ColumnImage> columns;
         private TableImage referenceTable;
         private Collection<ColumnImage> referenceColumns;
 
-        Chrysalis() {}
+        //TODO добавить присвоение прокси-таблицы полю table по-умолчанию
+        Builder() {}
 
-        Chrysalis setTable(TableImage t) {
+        @Override
+        public Builder setTable(TableImage t) {
             this.table = t;
             return this;
         }
 
-        Chrysalis setConstraintName(String n) {
+        @Override
+        public  TableImage getTable() {
+            return table;
+        }
+
+        @Override
+        public Builder setTableName(String name) {
+            this.tableName = name;
+            return this;
+        }
+
+        @Override
+        public String getTableName() {
+            return tableName;
+        }
+
+        @Override
+        public Builder setConstraintName(String n) {
             this.name = n;
             return this;
         }
 
-        Chrysalis setType(int t) {
+        @Override
+        public String getConstraintName() {
+            return name;
+        }
+
+        @Override
+        public Builder setType(int t) {
             switch (t) {
                 case Constraint.CHECK:
                 case Constraint.PRIMARY_KEY:
@@ -108,43 +142,76 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
             return this;
         }
 
-        Chrysalis setColumns(Collection<ColumnImage> cols) {
+        @Override
+        public int getType() {
+            return type;
+        }
+
+        @Override
+        public Builder setColumns(Collection<ColumnImage> cols) {
             if (columns == null) columns = new ArrayList<>();
             columns.addAll(cols);
             return this;
         }
 
-        Chrysalis setColumn(ColumnImage column) {
+        @Override
+        public Builder setColumn(ColumnImage column) {
             if (columns == null) columns = new ArrayList<>();
             columns.add(column);
             return this;
         }
 
-        Chrysalis setExpression(String expression) {
+        @Override
+        public Collection<ColumnImage> getColumns() {
+            return columns;
+        }
+
+        @Override
+        public Builder setExpression(String expression) {
             this.expression = expression;
             return this;
         }
 
-        Chrysalis setReferenceTable(TableImage table) {
+        @Override
+        public String getExpression() {
+            return expression;
+        }
+
+        @Override
+        public Builder setReferenceTable(TableImage table) {
             this.referenceTable = table;
             return this;
         }
 
-        Chrysalis setReferenceColumns(Collection<ColumnImage> cols) {
+        @Override
+        public TableImage getReferenceTable() {
+            return referenceTable;
+        }
+
+        @Override
+        public Builder setReferenceColumns(Collection<ColumnImage> cols) {
             if(referenceColumns == null) referenceColumns = new ArrayList<>();
             referenceColumns.addAll(cols);
             return this;
         }
 
-        Chrysalis setReferenceColumn(ColumnImage col) {
+        @Override
+        public Builder setReferenceColumn(ColumnImage col) {
             if(referenceColumns == null) referenceColumns = new ArrayList<>();
             referenceColumns.add(col);
             return this;
         }
 
-        public boolean isMature() {
+        @Override
+        public Collection<ColumnImage> getReferenceColumns() {
+            return referenceColumns;
+        }
+
+        @Override
+        public boolean isReady() {
             if (isNot(isAssign(type))) return false;
-            if (name == null || name.equals("")) return false;
+            if (name == null || name.isEmpty()) return false;
+            if (tableName == null || tableName.isEmpty()) return false;
             if (table == null) return false;
             switch (type) {
                 case Constraint.CHECK:
@@ -153,12 +220,13 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
                 case Constraint.PRIMARY_KEY:
                     return isNot(columns == null || columns.isEmpty());
                 case Constraint.FOREIGN_KEY:
-                    break;
+                    if(columns == null || columns.isEmpty()) return false;
+                    if(referenceColumns == null || referenceColumns.isEmpty()) return false;
+                    return referenceTable != null;
                 default:
                     throw new InternalError("Ошибка при создании объекта Constraint. Неизвестный тип ограничения: "
                             + type);
             }
-            return false;
         }
 
         private boolean isAssign(int type) {
@@ -167,6 +235,10 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
             if (type == Constraint.PRIMARY_KEY) return true;
             if (type == Constraint.FOREIGN_KEY) return true;
             return false;
+        }
+
+        ConstraintImpl build() {
+            return new ConstraintImpl(this);
         }
     }
 

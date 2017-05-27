@@ -29,4 +29,12 @@ public class NameDispatcher {
     public String getUniqueConstraintName(TableImage table) {
         return table.getTableName().toLowerCase() + "_unique_constraint";
     }
+
+    public String getPrimaryKeyConstraintName(String tableName) {
+        return tableName.toLowerCase() + "_pkey_constraint";
+    }
+
+    public String getForeignKeyConstraintName(String tableName) {
+        return tableName.toLowerCase() + "_fkey_constraint";
+    }
 }
