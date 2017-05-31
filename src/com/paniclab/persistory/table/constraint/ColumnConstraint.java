@@ -9,4 +9,6 @@ import java.util.Collection;
  */
 public interface ColumnConstraint {
     public Collection<ColumnImage> getColumns();
+    public Collection<String> getColumnsNames();
+    public boolean hasColumn(String columnName);
 }

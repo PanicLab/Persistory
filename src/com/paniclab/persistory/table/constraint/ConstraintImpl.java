@@ -28,19 +28,24 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private ConstraintImpl() {}
 
 
-    private ConstraintImpl(Builder builder) {
-        this.name = builder.name;
-        this.type = builder.type;
-        this.table = builder.table;
-        this.tableName = builder.tableName;
-        this.expression = builder.expression;
-        this.columns = Collections.unmodifiableCollection(builder.columns);
-        this.referenceTable = builder.referenceTable;
-        this.referenceColumns = Collections.unmodifiableCollection(builder.referenceColumns);
+    private ConstraintImpl(ConstraintConstructingKit kit) {
+        this.name = kit.getConstraintName();
+        this.type = kit.getType();
+        this.table = kit.getTable();
+        this.tableName = kit.getTableName();
+        this.expression = kit.getExpression();
+        this.columns = Collections.unmodifiableCollection(kit.getColumns());
+        this.referenceTable = kit.getReferenceTable();
+        this.referenceColumns = Collections.unmodifiableCollection(kit.getReferenceColumns());
     }
 
     @Override
     public int getType() {
+        return type;
+    }
+
+    @Override
+    public int getConstraintType() {
         return type;
     }
 
@@ -63,6 +68,23 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     @Override
     public Collection<ColumnImage> getColumns() {
         return columns;
+    }
+
+    @Override
+    public Collection<String> getColumnsNames() {
+        Collection<String> result = new ArrayList<>();
+        for (ColumnImage c: getColumns()) {
+            result.add(c.getName());
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasColumn(String columnName) {
+        for (ColumnImage c: getColumns()) {
+            if(c.getName().equals(columnName)) return true;
+        }
+        return false;
     }
 
     @Override

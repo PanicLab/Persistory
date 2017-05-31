@@ -21,6 +21,7 @@ public interface Constraint {
     public TableImage getTable();
     public String getTableName();
     public int getType();
+    public int getConstraintType();
 
     //public String getAlterTableExpression();
 

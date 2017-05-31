@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * Created by Сергей on 09.05.2017.
  */
-public interface ForeignKeyConstraint extends Constraint, ColumnConstraint {
+public interface ForeignKeyConstraint extends ColumnConstraint {
     public TableImage getReferenceTable();
     public Collection<ColumnImage> getReferenceColumns();
 }

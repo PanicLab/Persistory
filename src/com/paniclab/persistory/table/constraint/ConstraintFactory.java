@@ -13,19 +13,10 @@ import static com.paniclab.persistory.Utils.isNot;
  */
 public class ConstraintFactory {
 
-    //TODO переделать создание NameDispatcher
-    private NameDispatcher nameDispatcher = new NameDispatcher(new PersistorManagerImp());
-
     public ConstraintFactory() {}
 
-    public UniqueConstraint getUniqueConstraint(TableImage table) {
-
-        ConstraintImpl.Builder builder =
-                new ConstraintImpl.Builder().setType(Constraint.UNIQUE)
-                                            .setTable(table)
-                                            .setConstraintName(nameDispatcher.getUniqueConstraintName(table))
-                                            .setColumns(table.getUniqueColumns());
-        return builder.build();
+    public ConstraintConstructingKit getConstructingKit() {
+        return new ConstraintImpl.Builder();
     }
 
     public UniqueConstraint getUniqueConstraint(ConstraintConstructingKit kit) {
@@ -43,39 +34,5 @@ public class ConstraintFactory {
                 "данному шаблону. Тип шаблона: " + builder.getType());
 
         return builder.build();
-    }
-
-
-
-    public CheckConstraint getCheckConstraint(TableImage table) {
-        ConstraintImpl.Builder builder =
-                new ConstraintImpl.Builder().setType(Constraint.UNIQUE)
-                                            .setTable(table)
-                                            .setConstraintName(nameDispatcher.getUniqueConstraintName(table))
-                                            .setExpression(getCheckExpression(table));
-        return builder.build();
-    }
-
-    //TODO дописать метод, выдернув выражение из аннотации
-    private String getCheckExpression(TableImage table) {
-        return "";
-    }
-
-    public PrimaryKeyConstraint getPrimaryKeyConstraint(TableImage table) {
-        ConstraintImpl.Builder builder =
-                new ConstraintImpl.Builder().setType(Constraint.PRIMARY_KEY)
-                                            .setTable(table)
-                                            .setConstraintName(
-                                                    nameDispatcher.getPrimaryKeyConstraintName(table.getTableName()))
-                                            .setColumns(table.getPrimaryKeyColumns());
-        return builder.build();
-    }
-
-    public ForeignKeyConstraint getForeignKeyConstraint(TableImage table) {
-        return null;
-    }
-
-    public ConstraintConstructingKit getConstructingKit() {
-        return new ConstraintImpl.Builder();
     }
 }
