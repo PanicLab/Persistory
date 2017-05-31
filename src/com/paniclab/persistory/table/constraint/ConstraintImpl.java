@@ -13,7 +13,7 @@ import static com.paniclab.persistory.Utils.isNot;
  * Created by Сергей on 09.05.2017.
  */
 
-public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, ForeignKeyConstraint, CheckConstraint {
+class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, ForeignKeyConstraint, CheckConstraint {
 
     private String name;
     private int type;
@@ -28,15 +28,15 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
     private ConstraintImpl() {}
 
 
-    private ConstraintImpl(ConstraintConstructingKit kit) {
-        this.name = kit.getConstraintName();
-        this.type = kit.getType();
-        this.table = kit.getTable();
-        this.tableName = kit.getTableName();
-        this.expression = kit.getExpression();
-        this.columns = Collections.unmodifiableCollection(kit.getColumns());
-        this.referenceTable = kit.getReferenceTable();
-        this.referenceColumns = Collections.unmodifiableCollection(kit.getReferenceColumns());
+    private ConstraintImpl(ConstraintBuilder builder) {
+        this.name = builder.getConstraintName();
+        this.type = builder.getType();
+        this.table = builder.getTable();
+        this.tableName = builder.getTableName();
+        this.expression = builder.getExpression();
+        this.columns = Collections.unmodifiableCollection(builder.getColumns());
+        this.referenceTable = builder.getReferenceTable();
+        this.referenceColumns = Collections.unmodifiableCollection(builder.getReferenceColumns());
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
         return expression;
     }
 
-    static class Builder implements ConstraintConstructingKit {
+    static class Builder implements ConstraintBuilder {
 
         private String name;
         private int type;
@@ -259,7 +259,7 @@ public class ConstraintImpl implements UniqueConstraint, PrimaryKeyConstraint, F
             return false;
         }
 
-        ConstraintImpl build() {
+        public Constraint build() {
             return new ConstraintImpl(this);
         }
     }

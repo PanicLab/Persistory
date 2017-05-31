@@ -6,6 +6,10 @@ import com.paniclab.persistory.annotations.Linked;
 import com.paniclab.persistory.annotations.OnDelete;
 import com.paniclab.persistory.configuration.Configuration;
 import com.paniclab.persistory.configuration.ConfigurationFactory;
+import com.paniclab.persistory.table.constraint.CheckConstraint;
+import com.paniclab.persistory.table.constraint.Constraint;
+import com.paniclab.persistory.table.constraint.ConstraintBuilder;
+import com.paniclab.persistory.table.constraint.ConstraintFactory;
 
 
 import java.nio.file.Path;
@@ -64,5 +68,8 @@ public class Main {
         fileLoggerOld.log(Configuration.DEVELOPING, "Hello");
 
         loggerOld.logOnProduction("Однажды, в студеную зимнюю {1} я из лесу вышел, был сильный {2}!", "пору", "мороз");
+
+       ConstraintBuilder builder = new ConstraintFactory().getConstraintBuilder().setType(Constraint.CHECK);
+       Constraint constraint = new ConstraintFactory().getCheckConstraint(builder);
     }
 }
