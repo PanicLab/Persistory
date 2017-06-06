@@ -42,89 +42,91 @@ public class DBTest {
     @Test
     public void database_existance_test() throws Exception {
 
-        Statement statement = connection.createStatement();
 
-        String sql = "CREATE TABLE IF NOT EXISTS TOYS (" +
-                "NAME VARCHAR(255) NOT NULL UNIQUE ," +
-                "VENDOR VARCHAR(255) DEFAULT 'UNKNOWN'," +
-                "PRICE NUMERIC (15,2));";
 
-        statement.executeUpdate(sql);
+        try (Statement statement = connection.createStatement()){
 
-        DatabaseMetaData dmd = connection.getMetaData();
-        ResultSet res = dmd.getTables(null, null, "TOYS",
-                new String[] {"TABLE"});
+            String sql = "CREATE TABLE IF NOT EXISTS TOYS (" +
+                    "NAME VARCHAR(255) NOT NULL UNIQUE ," +
+                    "VENDOR VARCHAR(255) DEFAULT 'UNKNOWN'," +
+                    "PRICE NUMERIC (15,2));";
 
-        assertTrue(res.next());
-        assertEquals("TOYS", res.getString("TABLE_NAME"));
-        assertFalse(res.next());
-        res.close();
+            statement.executeUpdate(sql);
 
-        sql = "DROP TABLE TOYS";
-        statement.executeUpdate(sql);
+            DatabaseMetaData dmd = connection.getMetaData();
+            ResultSet res = dmd.getTables(null, null, "TOYS",
+                    new String[] {"TABLE"});
 
-        res = dmd.getTables(null, null, "TOYS",
-                new String[] {"TABLE"});
+            assertTrue(res.next());
+            assertEquals("TOYS", res.getString("TABLE_NAME"));
+            assertFalse(res.next());
+            res.close();
 
-        assertFalse(res.next());
+            sql = "DROP TABLE TOYS";
+            statement.executeUpdate(sql);
 
-        res.close();
-        statement.close();
+            res = dmd.getTables(null, null, "TOYS",
+                    new String[] {"TABLE"});
+
+            assertFalse(res.next());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void database_insert() throws Exception {
-        Statement statement = connection.createStatement();
 
-        String sql = "CREATE TABLE IF NOT EXISTS TOYS (" +
-                "NAME VARCHAR(255) NOT NULL UNIQUE ," +
-                "VENDOR VARCHAR(255) DEFAULT 'UNKNOWN'," +
-                "PRICE NUMERIC (15,2));";
+        try (Statement statement = connection.createStatement()){
+            String sql = "CREATE TABLE IF NOT EXISTS TOYS (" +
+                    "NAME VARCHAR(255) NOT NULL UNIQUE ," +
+                    "VENDOR VARCHAR(255) DEFAULT 'UNKNOWN'," +
+                    "PRICE NUMERIC (15,2));";
 
-        Toy djeburgashka = new Toy();
-        djeburgashka.setName("djeburgashka");
-        djeburgashka.setVendor("russia");
-        djeburgashka.setPrice(new BigDecimal(700, new MathContext(15)).setScale(2, BigDecimal.ROUND_HALF_UP));
+            Toy djeburgashka = new Toy();
+            djeburgashka.setName("djeburgashka");
+            djeburgashka.setVendor("russia");
+            djeburgashka.setPrice(new BigDecimal(700, new MathContext(15)).setScale(2, BigDecimal.ROUND_HALF_UP));
 
-        statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
 
-        DatabaseMetaData dmd = connection.getMetaData();
-        ResultSet res = dmd.getTables(null, null, "TOYS",
-                new String[] {"TABLE"});
+            DatabaseMetaData dmd = connection.getMetaData();
+            ResultSet res = dmd.getTables(null, null, "TOYS",
+                    new String[] {"TABLE"});
 
-        assertTrue(res.next());
-        res.close();
+            assertTrue(res.next());
+            res.close();
 
-        sql = String.format("INSERT INTO TOYS(NAME, VENDOR, PRICE)" +
-                " VALUES('%s', '%s', %s)", djeburgashka.getName(), djeburgashka.getVendor(),
-                djeburgashka.getPrice());
+            sql = String.format("INSERT INTO TOYS(NAME, VENDOR, PRICE)" +
+                    " VALUES('%s', '%s', %s)", djeburgashka.getName(), djeburgashka.getVendor(),
+                    djeburgashka.getPrice());
 
-        statement.executeUpdate(sql);
+            statement.executeUpdate(sql);
 
-        sql =  "SELECT * FROM TOYS WHERE NAME='djeburgashka'";
-        statement.executeQuery(sql);
+            sql =  "SELECT * FROM TOYS WHERE NAME='djeburgashka'";
+            statement.executeQuery(sql);
 
-        Toy fromDb = new Toy();
-        ResultSet rs = statement.getResultSet();
-        while (rs.next()) {
-            fromDb.setName(rs.getString("NAME"));
-            fromDb.setVendor(rs.getString("VENDOR"));
-            fromDb.setPrice(rs.getBigDecimal("PRICE"));
+            Toy fromDb = new Toy();
+            ResultSet rs = statement.getResultSet();
+            while (rs.next()) {
+                fromDb.setName(rs.getString("NAME"));
+                fromDb.setVendor(rs.getString("VENDOR"));
+                fromDb.setPrice(rs.getBigDecimal("PRICE"));
+            }
+            System.out.println("djeburgashka: ");
+            System.out.println("NAME: " + djeburgashka.getName());
+            System.out.println("VENDOR: " + djeburgashka.getVendor());
+            System.out.println("PRICE: " + djeburgashka.getPrice());
+            System.out.println();
+
+            System.out.println("fromDb: ");
+            System.out.println("NAME: " + fromDb.getName());
+            System.out.println("VENDOR: " + fromDb.getVendor());
+            System.out.println("PRICE: " + fromDb.getPrice());
+            System.out.println();
+            assertEquals(djeburgashka, fromDb);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        System.out.println("djeburgashka: ");
-        System.out.println("NAME: " + djeburgashka.getName());
-        System.out.println("VENDOR: " + djeburgashka.getVendor());
-        System.out.println("PRICE: " + djeburgashka.getPrice());
-        System.out.println();
-
-        System.out.println("fromDb: ");
-        System.out.println("NAME: " + fromDb.getName());
-        System.out.println("VENDOR: " + fromDb.getVendor());
-        System.out.println("PRICE: " + fromDb.getPrice());
-        System.out.println();
-        assertEquals(djeburgashka, fromDb);
-
-        rs.close();
-        statement.close();
     }
 }
